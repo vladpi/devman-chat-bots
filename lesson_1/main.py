@@ -4,7 +4,7 @@ from urllib.parse import urljoin
 import requests
 import telegram
 from dotenv import load_dotenv
-from requests.exceptions import Timeout
+from requests.exceptions import RequestException
 
 
 def get_new_attempts(token):
@@ -20,7 +20,7 @@ def get_new_attempts(token):
             params['timestamp'] = response.json().get('timestamp_to_request')
             yield response.json()
 
-        except Timeout:
+        except RequestException:
             continue
 
 
