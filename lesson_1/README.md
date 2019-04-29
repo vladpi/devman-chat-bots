@@ -23,7 +23,7 @@ pip install -r requirements.txt
 pipenv install
 ```
 
-Заполнить `.env` файл своими данными по примеру из `.env.examlpe`.
+Заполнить `.env` файл своими данными по примеру из `.env.example`.
 
 Запустить
 ```bash

@@ -4,13 +4,11 @@ from urllib.parse import urljoin
 import requests
 import telegram
 from dotenv import load_dotenv
-from requests.exceptions import Timeout
-
-load_dotenv()
+from requests.exceptions import RequestException
 
 
-def devman_long_polling(token):
-    """ Wait for new new reviews results."""
+def get_new_attempts(token):
+    """ Long polling for new new reviews results."""
 
     url = 'https://dvmn.org/api/long_polling/'
     headers = {'Authorization': 'Token {}'.format(token)}
@@ -19,10 +17,11 @@ def devman_long_polling(token):
     while True:
         try:
             response = requests.get(url, params=params, headers=headers, timeout=100)
+            response.raise_for_status()
             params['timestamp'] = response.json().get('timestamp_to_request')
             yield response.json()
 
-        except Timeout:
+        except RequestException:
             continue
 
 
@@ -46,15 +45,19 @@ def send_message(bot, chat_id, message):
 
 
 def main():
+    load_dotenv()
+
     devman_token = os.environ.get('DEVMAN_TOKEN')
     bot_token = os.environ.get('BOT_TOKEN')
     author_chat_id = os.environ.get('AUTHOR_CHAT_ID')
 
     devman_bot = telegram.Bot(token=bot_token)
 
-    for result in devman_long_polling(devman_token):
-        for new_attempt in result.get('new_attempts', []):
-            send_message(devman_bot, author_chat_id, get_message_text_from_json(new_attempt))
+    for response_json in get_new_attempts(devman_token):
+        for new_attempt in response_json.get('new_attempts', []):
+            message_text = get_message_text_from_json(new_attempt)
+            devman_bot.send_message(chat_id=author_chat_id, text=message_text,
+                                    parse_mode=telegram.ParseMode.MARKDOWN)
 
 
 if __name__ == '__main__':
