@@ -7,8 +7,8 @@ from dotenv import load_dotenv
 from requests.exceptions import Timeout
 
 
-def devman_long_polling(token):
-    """ Wait for new new reviews results."""
+def get_new_attempts(token):
+    """ Long polling for new new reviews results."""
 
     url = 'https://dvmn.org/api/long_polling/'
     headers = {'Authorization': 'Token {}'.format(token)}
@@ -52,8 +52,8 @@ def main():
 
     devman_bot = telegram.Bot(token=bot_token)
 
-    for result in devman_long_polling(devman_token):
-        for new_attempt in result.get('new_attempts', []):
+    for response_json in get_new_attempts(devman_token):
+        for new_attempt in response_json.get('new_attempts', []):
             send_message(devman_bot, author_chat_id, get_message_text_from_json(new_attempt))
 
 
