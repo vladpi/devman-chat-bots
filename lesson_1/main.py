@@ -6,8 +6,6 @@ import telegram
 from dotenv import load_dotenv
 from requests.exceptions import Timeout
 
-load_dotenv()
-
 
 def devman_long_polling(token):
     """ Wait for new new reviews results."""
@@ -46,6 +44,8 @@ def send_message(bot, chat_id, message):
 
 
 def main():
+    load_dotenv()
+
     devman_token = os.environ.get('DEVMAN_TOKEN')
     bot_token = os.environ.get('BOT_TOKEN')
     author_chat_id = os.environ.get('AUTHOR_CHAT_ID')
