@@ -54,7 +54,9 @@ def main():
 
     for response_json in get_new_attempts(devman_token):
         for new_attempt in response_json.get('new_attempts', []):
-            send_message(devman_bot, author_chat_id, get_message_text_from_json(new_attempt))
+            message_text = get_message_text_from_json(new_attempt)
+            devman_bot.send_message(chat_id=author_chat_id, text=message_text,
+                                    parse_mode=telegram.ParseMode.MARKDOWN)
 
 
 if __name__ == '__main__':
